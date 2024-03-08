@@ -9,7 +9,7 @@ export interface ShipmentDTO {
   packageDescription: string;
   weight: number;
   price: number;
-  sender: string;
+  sender?: string;
   currentStatus?: string;
   statusList?: StatusDTO[];
 }

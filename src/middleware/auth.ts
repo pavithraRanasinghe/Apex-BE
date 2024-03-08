@@ -2,8 +2,12 @@ import { NextFunction, Request, Response } from 'express';
 import { verifyToken } from '../config/jwt';
 import AppError from '../config/app.error';
 
+export interface UserRequest extends Request {
+  user?: number;
+}
+
 export const auth = async (
-  req: Request,
+  req: UserRequest,
   res: Response,
   next: NextFunction
 ) => {
@@ -22,7 +26,7 @@ export const auth = async (
     }
 
     // Validate the access token
-    const decoded = verifyToken<{ sub: string }>(
+    const decoded = verifyToken<{ userId: number }>(
       access_token,
       'accessTokenPublicKey'
     );
@@ -30,6 +34,7 @@ export const auth = async (
     if (!decoded) {
       return next(new AppError(401, `Invalid token`));
     }
+    req.user = decoded.userId;
     next();
   } catch (err: any) {
     next(err);

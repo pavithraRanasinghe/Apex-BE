@@ -95,3 +95,42 @@ export const trackShipment = async (trackingNumber: number) => {
     throw new AppError(500, "Something went wrong");
   }
 };
+
+export const fetchShipmentsbyUser = async (userId: number) => {
+  try {
+    const shipmentList = await db.shipment.findMany({
+      where: { userId: userId },
+      select: {
+        trackingNumber: true,
+        createdAt: true,
+        recipientName: true,
+        recipientAddress: true,
+        recipientMobile: true,
+        packageDescription: true,
+        weight: true,
+        price: true,
+        shipmentStatus: {
+          where: { active: true },
+          select: { status: true },
+          take: 1,
+        },
+      },
+    });
+    if (shipmentList.length === 0) {
+      throw new AppError(404, "Shipments not found");
+    }
+
+    return shipmentList.map((shipment) => {
+      if (shipment.shipmentStatus.length === 0) {
+        return shipment;
+      } else {
+        return {
+          ...shipment,
+          currentStatus: shipment.shipmentStatus[0].status,
+        };
+      }
+    });
+  } catch (error) {
+    throw error;
+  }
+};
