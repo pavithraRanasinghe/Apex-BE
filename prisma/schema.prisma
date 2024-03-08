@@ -37,7 +37,7 @@ model Shipment{
   recipientName String
   recipientAddress String
   recipientMobile Int
-  packageDescription String?
+  packageDescription String
   weight Float
   price Float
   user User @relation(fields: [userId], references: [id])
@@ -52,7 +52,7 @@ model ShipmentStatus{
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
   status Status @default(PENDING)
-  description String?
+  description String
   shipment Shipment @relation(fields: [shipmentId], references: [id])
   shipmentId Int
 }

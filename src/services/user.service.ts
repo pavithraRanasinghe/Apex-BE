@@ -21,7 +21,7 @@ export const createUser = async (userReq: Prisma.UserCreateInput) => {
     }
 };
 
-export const findByEmail = async (
+export const findUnique = async (
   where: Prisma.UserWhereUniqueInput
 ) => {
   return (await db.user.findUnique({
