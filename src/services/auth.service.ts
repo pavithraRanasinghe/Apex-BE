@@ -2,7 +2,7 @@ import { NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import config from "config";
 
-import { findByEmail } from "./user.service";
+import { findUnique } from "./user.service";
 import AppError from "../config/app.error";
 import { generateToken } from "../config/jwt";
 import { UserDTO } from "../dto/user.dto";
@@ -12,7 +12,7 @@ export const userLogIn = async (
   password: string,
   next: NextFunction
 ) => {
-  const user = await findByEmail(
+  const user = await findUnique(
     { email: email },
   );
   if (!user) {
@@ -26,7 +26,6 @@ export const userLogIn = async (
   const token = generateToken({ sub: user.id }, "accessTokenPrivateKey", {
     expiresIn: `${config.get<number>("accessTokenExpiresIn")}`,
   });
-  console.log("Token : ", token);
   const userResponse: UserDTO = {
     id: user.id,
     name: user.name,

@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 
 import userRouter from './routes/user.routes';
 import authRouter from './routes/auth.routes';
+import shipmentRouter from './routes/shipment.routes'
 
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -10,5 +11,6 @@ app.use(bodyParser.json());
 
 app.use('/api/user', userRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/shipment', shipmentRouter);
 
 app.listen(PORT, ()=> console.log(`Server listen on port ${PORT}`)); 
