@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { validator } from "../middleware/validator";
 import {
@@ -14,29 +14,26 @@ const router = express.Router();
 router.post(
   "/",
   validator(registerUserSchema),
-  async (req: Request<{}, {}, RegisterUserSchemaType>, res: Response) => {
-    const password = await bcrypt.hash(req.body.password, 12);
+  async (req: Request<{}, {}, RegisterUserSchemaType>, res: Response, next: NextFunction) => {
+    try{
+        const password = await bcrypt.hash(req.body.password, 12);
 
-    const user = await createUser({
+    const user: UserDTO = await createUser({
       name: req.body.name,
       address: req.body.address,
       email: req.body.email,
       password: password,
       role: req.body.role,
     });
-    const userResponse: UserDTO = {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      address: user.address,
-      role: user.role
-    };
-    res.status(200).json({
+    res.status(201).json({
       message: "Success",
       data: {
-        userResponse,
+        user,
       },
     });
+    }catch(error){
+        next(error);
+    }
   }
 );
 
