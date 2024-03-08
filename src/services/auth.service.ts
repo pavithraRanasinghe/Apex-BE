@@ -21,7 +21,7 @@ export const userLogIn = async (
     throw next(new AppError(400, "Invalid email or password"));
   }
 
-  const token = generateToken({ sub: user.id }, "accessTokenPrivateKey", {
+  const token = generateToken({ userId: user.id }, "accessTokenPrivateKey", {
     expiresIn: `${config.get<number>("accessTokenExpiresIn")}`,
   });
   const userResponse: UserDTO = {

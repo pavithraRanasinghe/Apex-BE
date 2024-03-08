@@ -1,8 +1,8 @@
 import express, { NextFunction, Request, Response } from "express";
 import { validator } from "../middleware/validator";
 import { ShipmentSchemaType, shipmentSchema } from "../schemas/shipment.schema";
-import { createShipment, trackShipment } from "../services/shipment.service";
-import { auth } from "../middleware/auth";
+import { createShipment, fetchShipmentsbyUser, trackShipment } from "../services/shipment.service";
+import { UserRequest, auth } from "../middleware/auth";
 
 const router = express.Router();
 router.use(auth);
@@ -27,9 +27,17 @@ router.get("/:trackingNumber", async (req: Request, res: Response) => {
       data: shipmentDetails,
     });
   } catch (error) {
-    console.log("ERRORRRE");
     throw error;
   }
+});
+
+router.get("/",async(req:UserRequest, res:Response)=>{
+    const userId:any = req.user;
+    const shipmentList = await fetchShipmentsbyUser(userId);
+    res.status(200).json({
+        message: "Shipment list fetch successful",
+        data: shipmentList
+    })
 });
 
 export default router;
