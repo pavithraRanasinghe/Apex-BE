@@ -8,4 +8,5 @@ export interface ShipmentDTO {
   weight: number;
   price: number;
   sender: string;
+  status: string;
 }
