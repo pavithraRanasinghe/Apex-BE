@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User{
+  @@map("users")
+
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  name String
+  address String
+  email String
+  password String
+  role Role @default(SENDER)
+  shipment Shipment[]
+}
+
+model Shipment{
+  @@map("shipment")
+
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  trackingNumber Int @unique
+  recipientName String
+  recipientAddress String
+  recipientMobile Int
+  packageDescription String?
+  weight Float
+  price Float
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  shipmentStatus ShipmentStatus[]
+}
+
+model ShipmentStatus{
+  @@map("shipment_status")
+
+  id Int @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updateAt DateTime @updatedAt
+  status Status @default(PENDING)
+  description String?
+  shipment Shipment @relation(fields: [shipmentId], references: [id])
+  shipmentId Int
+}
+
+enum Role{
+  ADMIN
+  SENDER
+}
+
+enum Status{
+  PENDING
+  ACCEPTED
+  DELIVERING
+  DONE
+  CANCELLED
+  RETURN
+}
