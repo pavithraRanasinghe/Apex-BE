@@ -25,4 +25,17 @@ export const registerUserSchema = object({
   }),
 });
 
+export const logInUserSchema = object({
+    body: object({
+      email: string({
+        required_error: "Email cannot be empty",
+      }).email("Invalid email address"),
+      password: string({
+        required_error: "Password cannot be empty",
+      }).min(8, "Password must be more than 8 characters"),
+      role: z.optional(z.nativeEnum(Role)),
+    })
+  });
+
 export type RegisterUserSchemaType = TypeOf<typeof registerUserSchema>["body"];
+export type LongInUserSchemaType = TypeOf<typeof logInUserSchema>["body"];
