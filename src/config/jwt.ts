@@ -17,3 +17,20 @@ export const generateToken = (
   });
 
 };
+
+export const verifyToken = <T>(
+  token: string,
+  keyName: 'accessTokenPublicKey'
+): T | null => {
+  try {
+    const publicKey = Buffer.from(
+      config.get<string>(keyName),
+      'base64'
+    ).toString('ascii');
+    const decoded = jwt.verify(token, publicKey) as T;
+
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+};
