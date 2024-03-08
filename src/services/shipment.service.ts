@@ -4,6 +4,8 @@ import { ShipmentSchemaType } from "../schemas/shipment.schema";
 import { findUnique } from "./user.service";
 import { ShipmentDTO } from "../dto/shipment.dto";
 import { saveStatus } from "./status.service";
+import AppError from "../config/app.error";
+import { StatusDTO } from "../dto/status.dto";
 
 export const createShipment = async (request: ShipmentSchemaType) => {
   try {
@@ -24,32 +26,72 @@ export const createShipment = async (request: ShipmentSchemaType) => {
       },
     };
 
-    return db.$transaction(async (tx)=>{
-        const shipment = (await db.shipment.create({
-            data: shipmentRequest,
-          })) as Shipment;
-      
-          if(!shipment.id){
-            throw new Error('Shipment status not updated');
-          }
-          const shipmentStatus = await saveStatus(shipment);
+    return db.$transaction(async (tx) => {
+      const shipment = (await db.shipment.create({
+        data: shipmentRequest,
+      })) as Shipment;
 
-          const shipmentResponse: ShipmentDTO = {
-            trackingNumber: shipment.trackingNumber,
-            createdAt: shipment.createdAt,
-            recipientName: shipment.recipientName,
-            recipientAddress: shipment.recipientAddress,
-            recipientMobile: shipment.recipientMobile,
-            packageDescription: shipment.packageDescription,
-            weight: shipment.weight,
-            price: shipment.price,
-            sender: user.name,
-            status: shipmentStatus.status
-        }
-        return shipmentResponse;
+      if (!shipment.id) {
+        throw new AppError(417, "Shipment status not created");
+      }
+      const shipmentStatus = await saveStatus(shipment);
+
+      const shipmentResponse: ShipmentDTO = {
+        trackingNumber: shipment.trackingNumber,
+        createdAt: shipment.createdAt,
+        recipientName: shipment.recipientName,
+        recipientAddress: shipment.recipientAddress,
+        recipientMobile: shipment.recipientMobile,
+        packageDescription: shipment.packageDescription,
+        weight: shipment.weight,
+        price: shipment.price,
+        sender: user.name,
+        currentStatus: shipmentStatus.status,
+      };
+      return shipmentResponse;
+    });
+  } catch (error) {
+    throw new AppError(500, "Something went wrong");
+  }
+};
+
+export const trackShipment = async (trackingNumber: number) => {
+  try {
+    const shipment = await db.shipment.findUnique({
+      where: { trackingNumber: trackingNumber },
+      include: {
+        user: true,
+        shipmentStatus: true,
+      },
     });
 
+    if (!shipment) {
+      throw new AppError(404, "Shipment not found");
+    }
+
+    const statusList = shipment.shipmentStatus.map(
+      (shipmentStatus) =>
+        ({
+          status: shipmentStatus.status,
+          description: shipmentStatus.description,
+          date: shipmentStatus.createdAt,
+          active: shipmentStatus.active,
+        } as StatusDTO)
+    );
+    const shipmentResponse: ShipmentDTO = {
+      trackingNumber: shipment.trackingNumber,
+      createdAt: shipment.createdAt,
+      recipientName: shipment.recipientName,
+      recipientAddress: shipment.recipientAddress,
+      recipientMobile: shipment.recipientMobile,
+      packageDescription: shipment.packageDescription,
+      weight: shipment.weight,
+      price: shipment.price,
+      sender: shipment.user.name,
+      statusList: statusList,
+    };
+    return shipmentResponse;
   } catch (error) {
-    throw error;
+    throw new AppError(500, "Something went wrong");
   }
 };

@@ -1,3 +1,5 @@
+import { StatusDTO } from "./status.dto";
+
 export interface ShipmentDTO {
   trackingNumber: number;
   createdAt: Date;
@@ -8,5 +10,6 @@ export interface ShipmentDTO {
   weight: number;
   price: number;
   sender: string;
-  status: string;
+  currentStatus?: string;
+  statusList?: StatusDTO[];
 }

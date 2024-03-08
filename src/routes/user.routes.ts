@@ -8,6 +8,7 @@ import {
 
 import { createUser } from "../services/user.service";
 import { UserDTO } from "../dto/user.dto";
+import AppError from "../config/app.error";
 
 const router = express.Router();
 
@@ -32,7 +33,7 @@ router.post(
       },
     });
     }catch(error){
-        next(error);
+        throw new AppError(500, "Something went wrong");
     }
   }
 );

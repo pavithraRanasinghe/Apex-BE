@@ -12,9 +12,7 @@ export const userLogIn = async (
   password: string,
   next: NextFunction
 ) => {
-  const user = await findUnique(
-    { email: email },
-  );
+  const user = await findUnique({ email: email });
   if (!user) {
     throw next(new AppError(400, "Invalid email or password"));
   }
