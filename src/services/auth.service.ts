@@ -7,6 +7,14 @@ import AppError from "../config/app.error";
 import { generateToken } from "../config/jwt";
 import { UserDTO } from "../dto/user.dto";
 
+/**
+ * User Login for all Roles
+ * 
+ * @param email as a username
+ * @param password raw password
+ * @param next callback fn
+ * @returns Logged User
+ */
 export const userLogIn = async (
   email: string,
   password: string,

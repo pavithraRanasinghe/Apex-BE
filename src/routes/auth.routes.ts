@@ -7,6 +7,9 @@ import { Role } from "@prisma/client";
 
 const router = express.Router();
 
+/**
+ * This Route for sender's login
+ */
 router.post(
   "/login",
   validator(logInUserSchema),
@@ -34,6 +37,9 @@ router.post(
   }
 );
 
+/**
+ * This Route for admin's login
+ */
 router.post(
   "/admin/login",
   validator(logInUserSchema),

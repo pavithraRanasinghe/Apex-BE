@@ -1,6 +1,9 @@
 import { Role } from "@prisma/client";
 import { object, string, TypeOf, z } from "zod";
 
+/**
+ * Validation for user registration request
+ */
 export const registerUserSchema = object({
   body: object({
     name: string({
@@ -25,6 +28,9 @@ export const registerUserSchema = object({
   }),
 });
 
+/**
+ * Validation for user login request
+ */
 export const logInUserSchema = object({
     body: object({
       email: string({

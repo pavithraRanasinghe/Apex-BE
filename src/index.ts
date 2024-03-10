@@ -7,6 +7,7 @@ import userRouter from "./routes/user.routes";
 import authRouter from "./routes/auth.routes";
 import shipmentRouter from "./routes/shipment.routes";
 import adminShipmentRouter from './routes/adminShipment.routes';
+import publicRouter from './routes/public.routes';
 
 import { createUser, findUnique } from "./services/user.service";
 import { Role } from "@prisma/client";
@@ -20,6 +21,7 @@ app.use("/api/user", userRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/shipment", shipmentRouter);
 app.use("/api/admin/shipment", adminShipmentRouter);
+app.use("/api/public", publicRouter);
 
 const createAdmin = async () => {
   const user = await findUnique({ email: "admin@apex.com" });

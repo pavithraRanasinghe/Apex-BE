@@ -1,6 +1,12 @@
 import { Status } from "@prisma/client";
 import { db } from "../config/db.server";
 
+/**
+ * Fetch shipments by status
+ * 
+ * @param status shipment status type
+ * @returns Shipment list
+ */
 export const fetchShipmentsStatus = async (status: Status) => {
   try {
     const shipmentList = await db.shipment.findMany({
