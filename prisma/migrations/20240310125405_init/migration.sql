@@ -23,7 +23,7 @@ CREATE TABLE "shipment" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
-    "trackingNumber" BIGINT NOT NULL,
+    "trackingNumber" INTEGER NOT NULL,
     "recipientName" TEXT NOT NULL,
     "recipientAddress" TEXT NOT NULL,
     "recipientMobile" INTEGER NOT NULL,

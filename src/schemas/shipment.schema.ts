@@ -27,4 +27,18 @@ export const shipmentSchema = object({
   })
 });
 
+export const shipmentUpdateSchema = object({
+  body: object({
+    shipmentId: number({
+      required_error: "Shipment id cannot be empty",
+    }),
+    status: string({
+      required_error: "Status cannot be empty",
+    }),
+    description: z.optional(z.string())
+  })
+});
+
+
 export type ShipmentSchemaType = TypeOf<typeof shipmentSchema>["body"];
+export type ShipmentUpdateSchemaType = TypeOf<typeof shipmentUpdateSchema>["body"];

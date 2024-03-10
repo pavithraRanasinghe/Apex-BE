@@ -1,7 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import { validator } from "../middleware/validator";
-import { ShipmentSchemaType, shipmentSchema } from "../schemas/shipment.schema";
-import { createShipment, fetchShipmentsbyUser, fetchShipmentsbyUserAndStataus, trackShipment } from "../services/shipment.service";
+import { ShipmentSchemaType, ShipmentUpdateSchemaType, shipmentSchema, shipmentUpdateSchema } from "../schemas/shipment.schema";
+import { createShipment, fetchShipmentsbyUser, fetchShipmentsbyUserAndStataus, trackShipment, updateShipmentStatus } from "../services/shipment.service";
 import { UserRequest, auth } from "../middleware/auth";
 import { Role, Status } from "@prisma/client";
 
@@ -15,6 +15,25 @@ router.post(
       const shipment = await createShipment(req.body);
       res.status(201).json({
         message: "Shipment save successful",
+        data: shipment,
+      });
+    }catch(error: any){
+      res.status(error.statusCode).json({
+        code: error.statusCode,
+        message: error.message
+    });
+    }
+  }
+);
+
+router.put(
+  "/",
+  validator(shipmentUpdateSchema),
+  async (req: Request<{}, {}, ShipmentUpdateSchemaType>, res: Response) => {
+    try{
+      const shipment = await updateShipmentStatus(req.body);
+      res.status(200).json({
+        message: "Shipment update successful",
         data: shipment,
       });
     }catch(error: any){

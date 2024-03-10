@@ -52,7 +52,7 @@ model ShipmentStatus{
   createdAt DateTime @default(now())
   updateAt DateTime @updatedAt
   status Status @default(PENDING)
-  description String
+  description String?
   active Boolean
   shipment Shipment @relation(fields: [shipmentId], references: [id])
   shipmentId Int

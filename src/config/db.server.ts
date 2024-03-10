@@ -8,7 +8,6 @@ declare global {
 
 if (!global.__db) {
   global.__db = new PrismaClient();
-  global.__db.$connect();
 }
 
 db = global.__db;
