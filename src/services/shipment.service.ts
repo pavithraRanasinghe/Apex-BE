@@ -73,7 +73,7 @@ export const updateShipmentStatus = async (
     await updateStatus(request.shipmentId);
     await saveStatus(shipment, request.status as Status, request.description);
   } catch (error) {
-    throw error;
+    throw error
   }
 };
 

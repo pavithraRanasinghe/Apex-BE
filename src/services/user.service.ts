@@ -5,10 +5,11 @@ import AppError from "../config/app.error";
 
 export const createUser = async (userReq: Prisma.UserCreateInput) => {
   try {
+    console.log('REQ : ', userReq);
     const user = (await db.user.create({
       data: userReq,
     })) as User;
-
+    console.log('U : ', user);
     const userResponse: UserDTO = {
       id: user.id,
       name: user.name,
@@ -18,7 +19,7 @@ export const createUser = async (userReq: Prisma.UserCreateInput) => {
     };
     return userResponse;
   } catch (error) {
-    throw new AppError(500, "Something went wrong");
+    throw new AppError(500, "User not created");
   }
 };
 
