@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { verifyToken } from '../config/jwt';
 import AppError from '../config/app.error';
+import { findUnique } from '../services/user.service';
+import { User } from '@prisma/client';
 
 export interface UserRequest extends Request {
   user?: number;
@@ -20,11 +22,9 @@ export const auth = async (
     ) {
       access_token = req.headers.authorization.split(' ')[1];
     }
-
     if (!access_token) {
       return next(new AppError(401, 'Unauthorized'));
     }
-
     // Validate the access token
     const decoded = verifyToken<{ userId: number }>(
       access_token,
@@ -34,6 +34,12 @@ export const auth = async (
     if (!decoded) {
       return next(new AppError(401, `Invalid token`));
     }
+
+    const user: User = await findUnique({ id: decoded.userId });
+    if (!user) {
+      return next(new AppError(401, `Invalid token`));
+    }
+
     req.user = decoded.userId;
     next();
   } catch (err: any) {

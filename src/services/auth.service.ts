@@ -12,26 +12,31 @@ export const userLogIn = async (
   password: string,
   next: NextFunction
 ) => {
-  const user = await findUnique({ email: email });
-  if (!user) {
-    throw next(new AppError(400, "Invalid email or password"));
+  try {
+    const user = await findUnique({ email: email });
+    if (!user) {
+      throw new AppError(400, "Invalid email or password");
+    }
+    
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      throw new AppError(400, "Invalid email or password");
+    }
+
+    const token = generateToken({ userId: user.id }, "accessTokenPrivateKey", {
+      expiresIn: `${config.get<number>("accessTokenExpiresIn")}`,
+    });
+    const userResponse: UserDTO = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      address: user.address,
+      role: user.role,
+      token: token,
+    };
+
+    return userResponse;
+
+  } catch (error) {
+    throw error;
   }
-
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    throw next(new AppError(400, "Invalid email or password"));
-  }
-
-  const token = generateToken({ userId: user.id }, "accessTokenPrivateKey", {
-    expiresIn: `${config.get<number>("accessTokenExpiresIn")}`,
-  });
-  const userResponse: UserDTO = {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-    address: user.address,
-    role: user.role,
-    token: token,
-  };
-
-  return userResponse;
 };

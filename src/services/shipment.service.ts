@@ -1,4 +1,4 @@
-import { Prisma, Shipment, User } from "@prisma/client";
+import { Prisma, Role, Shipment, Status, User } from "@prisma/client";
 import { db } from "../config/db.server";
 import { ShipmentSchemaType } from "../schemas/shipment.schema";
 import { findUnique } from "./user.service";
@@ -9,7 +9,7 @@ import { StatusDTO } from "../dto/status.dto";
 
 export const createShipment = async (request: ShipmentSchemaType) => {
   try {
-    const trackingNumber: number = 5123;
+    const trackingNumber: number = 123;
     const price = 300.0;
 
     const user: User = await findUnique({ id: request.userId });
@@ -26,17 +26,16 @@ export const createShipment = async (request: ShipmentSchemaType) => {
       },
     };
 
-    return db.$transaction(async (tx) => {
+   return await db.$transaction(async (tx) => {
       const shipment = (await db.shipment.create({
         data: shipmentRequest,
       })) as Shipment;
-
       if (!shipment.id) {
         throw new AppError(417, "Shipment status not created");
       }
       const shipmentStatus = await saveStatus(shipment);
 
-      const shipmentResponse: ShipmentDTO = {
+      return {
         trackingNumber: shipment.trackingNumber,
         createdAt: shipment.createdAt,
         recipientName: shipment.recipientName,
@@ -47,11 +46,11 @@ export const createShipment = async (request: ShipmentSchemaType) => {
         price: shipment.price,
         sender: user.name,
         currentStatus: shipmentStatus.status,
-      };
-      return shipmentResponse;
+      } as ShipmentDTO;
     });
-  } catch (error) {
-    throw new AppError(500, "Something went wrong");
+  } catch (error:any) {
+    console.log(error.message);
+    throw new AppError(500, error.message);
   }
 };
 
@@ -130,6 +129,53 @@ export const fetchShipmentsbyUser = async (userId: number) => {
         };
       }
     });
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchShipmentsbyUserAndStataus = async (
+  userId: number,
+  status: Status
+) => {
+  try {
+    const shipmentList = await db.shipment.findMany({
+      where: {
+        userId: userId,
+        AND: [
+          {
+            shipmentStatus: {
+              some: {
+                status: status,
+              },
+            },
+          },
+        ],
+      },
+      select: {
+        trackingNumber: true,
+        createdAt: true,
+        recipientName: true,
+        recipientAddress: true,
+        recipientMobile: true,
+        packageDescription: true,
+        weight: true,
+        price: true,
+        shipmentStatus: {
+          where: { status: status },
+          select: {
+            description: true,
+            status: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    if (shipmentList.length === 0) {
+      return [];
+    }
+    return shipmentList;
   } catch (error) {
     throw error;
   }
