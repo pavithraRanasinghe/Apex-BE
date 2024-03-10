@@ -1,14 +1,8 @@
-/*
-  Warnings:
-
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
-CREATE TYPE "Status" AS ENUM ('PENDING', 'ACCEPTED', 'DELIVERING', 'DONE', 'CANCELLED', 'RETURN');
+CREATE TYPE "Role" AS ENUM ('ADMIN', 'SENDER');
 
--- DropTable
-DROP TABLE "User";
+-- CreateEnum
+CREATE TYPE "Status" AS ENUM ('PENDING', 'ACCEPTED', 'ACTIVE', 'DONE', 'CANCELLED', 'RETURN');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -29,11 +23,11 @@ CREATE TABLE "shipment" (
     "id" SERIAL NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
-    "trackingNumber" INTEGER NOT NULL,
+    "trackingNumber" BIGINT NOT NULL,
     "recipientName" TEXT NOT NULL,
     "recipientAddress" TEXT NOT NULL,
     "recipientMobile" INTEGER NOT NULL,
-    "packageDescription" TEXT,
+    "packageDescription" TEXT NOT NULL,
     "weight" DOUBLE PRECISION NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "userId" INTEGER NOT NULL,
@@ -47,11 +41,15 @@ CREATE TABLE "shipment_status" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updateAt" TIMESTAMP(3) NOT NULL,
     "status" "Status" NOT NULL DEFAULT 'PENDING',
-    "description" TEXT,
+    "description" TEXT NOT NULL,
+    "active" BOOLEAN NOT NULL,
     "shipmentId" INTEGER NOT NULL,
 
     CONSTRAINT "shipment_status_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "shipment_trackingNumber_key" ON "shipment"("trackingNumber");

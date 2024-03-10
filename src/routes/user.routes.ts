@@ -32,8 +32,11 @@ router.post(
         user,
       },
     });
-    }catch(error){
-        throw new AppError(500, "Something went wrong");
+    }catch(error: any){
+      res.status(error.statusCode).json({
+        code: error.statusCode,
+        message: error.message
+    });
     }
   }
 );
