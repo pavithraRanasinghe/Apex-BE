@@ -10,13 +10,20 @@ import { saveStatus, updateStatus } from "./status.service";
 import AppError from "../config/app.error";
 import { StatusDTO } from "../dto/status.dto";
 
+/**
+ * Create new shipment for deliver
+ * 
+ * @param request shipment details
+ * @returns Saved shipment
+ */
 export const createShipment = async (request: ShipmentSchemaType) => {
   try {
-    const trackingNumber: number = 123;
+    const trackingNumber = await getTrackingNumber();
+    //Assume price is fixed for every destination
     const price = 300.0;
 
     const user: User = await findUnique({ id: request.userId });
-    console.log("CREATE : ", user);
+
     const shipmentRequest: Prisma.ShipmentCreateInput = {
       trackingNumber: trackingNumber,
       recipientName: request.recipientName,
@@ -58,6 +65,12 @@ export const createShipment = async (request: ShipmentSchemaType) => {
   }
 };
 
+/**
+ * Update existing shipment is activate or not
+ * Create new shipment status
+ * 
+ * @param request Shipment id & status
+ */
 export const updateShipmentStatus = async (
   request: ShipmentUpdateSchemaType
 ) => {
@@ -77,6 +90,12 @@ export const updateShipmentStatus = async (
   }
 };
 
+/**
+ * Track shipment by tracking number
+ * 
+ * @param trackingNumber shipment tracking number
+ * @returns single Shipment with multiple status
+ */
 export const trackShipment = async (trackingNumber: number) => {
   try {
     const shipment = await db.shipment.findUnique({
@@ -118,6 +137,12 @@ export const trackShipment = async (trackingNumber: number) => {
   }
 };
 
+/**
+ * Fetch all shipments belongs to the user
+ * 
+ * @param userId User's id
+ * @returns shipment list
+ */
 export const fetchShipmentsbyUser = async (userId: number) => {
   try {
     const shipmentList = await db.shipment.findMany({
@@ -157,6 +182,13 @@ export const fetchShipmentsbyUser = async (userId: number) => {
   }
 };
 
+/**
+ * Fetch shipment list by user id and status
+ * 
+ * @param userId User's id
+ * @param status Status
+ * @returns Shipment list with single status
+ */
 export const fetchShipmentsbyUserAndStataus = async (
   userId: number,
   status: Status
@@ -203,3 +235,18 @@ export const fetchShipmentsbyUserAndStataus = async (
     throw error;
   }
 };
+
+/**
+ * Generate tracking number
+ * 
+ * @returns tracking type number
+ */
+const getTrackingNumber = async()=>{
+  try{
+    const count: string = await db.shipment.count() +"";
+    const date: Date = new Date();
+    return parseInt(date.getMinutes()+count+date.getMilliseconds());
+  }catch(error){
+    throw error
+  }
+}

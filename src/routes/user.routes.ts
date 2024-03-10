@@ -8,10 +8,12 @@ import {
 
 import { createUser } from "../services/user.service";
 import { UserDTO } from "../dto/user.dto";
-import AppError from "../config/app.error";
 
 const router = express.Router();
 
+/**
+ * This Route for create new user 
+ */
 router.post(
   "/",
   validator(registerUserSchema),

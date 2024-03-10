@@ -9,6 +9,9 @@ import { updateShipmentStatus } from "../services/shipment.service";
 const router = express.Router();
 router.use(auth)
 
+/**
+ * Route for fetch shipments by status
+ */
 router.get("/status/:status", async (req: Request, res: Response) => {
   try {
     const status: Status = req.params.status as Status;
@@ -25,6 +28,9 @@ router.get("/status/:status", async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * Route for update shipment status
+ */
 router.put(
     "/",
     validator(shipmentUpdateSchema),

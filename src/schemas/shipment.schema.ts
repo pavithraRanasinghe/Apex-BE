@@ -1,5 +1,8 @@
 import { number, object, string, TypeOf, z } from "zod";
 
+/**
+ * Validation for shipment creation request
+ */
 export const shipmentSchema = object({
   body: object({
     recipientName: string({
@@ -27,6 +30,9 @@ export const shipmentSchema = object({
   })
 });
 
+/**
+ * Validation for shipment status update request
+ */
 export const shipmentUpdateSchema = object({
   body: object({
     shipmentId: number({

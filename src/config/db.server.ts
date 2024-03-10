@@ -1,5 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 
+/**
+ * Responsible for create only single Prisma client instance
+ */
 let db: PrismaClient;
 
 declare global {

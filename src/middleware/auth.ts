@@ -8,6 +8,14 @@ export interface UserRequest extends Request {
   user?: number;
 }
 
+/**
+ * Authenticate user by JWT token
+ * 
+ * @param req Http request
+ * @param res Http response
+ * @param next Callback function
+ * @returns Callback
+ */
 export const auth = async (
   req: UserRequest,
   res: Response,

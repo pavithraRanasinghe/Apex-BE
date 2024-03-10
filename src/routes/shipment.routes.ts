@@ -1,12 +1,16 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import { validator } from "../middleware/validator";
-import { ShipmentSchemaType, ShipmentUpdateSchemaType, shipmentSchema, shipmentUpdateSchema } from "../schemas/shipment.schema";
-import { createShipment, fetchShipmentsbyUser, fetchShipmentsbyUserAndStataus, trackShipment, updateShipmentStatus } from "../services/shipment.service";
+import { ShipmentSchemaType, shipmentSchema } from "../schemas/shipment.schema";
+import { createShipment, fetchShipmentsbyUser, fetchShipmentsbyUserAndStataus } from "../services/shipment.service";
 import { UserRequest, auth } from "../middleware/auth";
-import { Role, Status } from "@prisma/client";
+import { Status } from "@prisma/client";
 
 const router = express.Router();
 router.use(auth);
+
+/**
+ * This Route for create new shipment
+ */
 router.post(
   "/",
   validator(shipmentSchema),
@@ -26,22 +30,9 @@ router.post(
   }
 );
 
-router.get("/:trackingNumber", async (req: Request, res: Response) => {
-  try {
-    const trackingNumber: number = parseInt(req.params.trackingNumber);
-    const shipmentDetails = await trackShipment(trackingNumber);
-    res.status(200).json({
-      message: "Shipment details fetch successful",
-      data: shipmentDetails,
-    });
-  } catch (error: any) {
-    res.status(error.statusCode).json({
-      code: error.statusCode,
-      message: error.message
-  });
-  }
-});
-
+/**
+ * This Route for fetch all shipments by user id
+ */
 router.get("/",async(req:UserRequest, res:Response)=>{
   try{
     const userId:any = req.user;
@@ -58,6 +49,9 @@ router.get("/",async(req:UserRequest, res:Response)=>{
   }
 });
 
+/**
+ * This Route for fetch shipment by status and logged user
+ */
 router.get("/status/:status",async(req:UserRequest, res:Response)=>{
   try{
     const userId:any = req.user;
