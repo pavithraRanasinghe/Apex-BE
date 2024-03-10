@@ -15,28 +15,32 @@ const router = express.Router();
 router.post(
   "/",
   validator(registerUserSchema),
-  async (req: Request<{}, {}, RegisterUserSchemaType>, res: Response, next: NextFunction) => {
-    try{
-        const password = await bcrypt.hash(req.body.password, 12);
+  async (
+    req: Request<{}, {}, RegisterUserSchemaType>,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const password = await bcrypt.hash(req.body.password, 12);
 
-    const user: UserDTO = await createUser({
-      name: req.body.name,
-      address: req.body.address,
-      email: req.body.email,
-      password: password,
-      role: req.body.role,
-    });
-    res.status(201).json({
-      message: "Success",
-      data: {
-        user,
-      },
-    });
-    }catch(error: any){
+      const user: UserDTO = await createUser({
+        name: req.body.name,
+        address: req.body.address,
+        email: req.body.email,
+        password: password,
+        role: req.body.role,
+      });
+      res.status(201).json({
+        message: "Success",
+        data: {
+          user,
+        },
+      });
+    } catch (error: any) {
       res.status(error.statusCode).json({
         code: error.statusCode,
-        message: error.message
-    });
+        message: error.message,
+      });
     }
   }
 );

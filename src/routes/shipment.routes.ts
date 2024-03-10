@@ -26,25 +26,6 @@ router.post(
   }
 );
 
-router.put(
-  "/",
-  validator(shipmentUpdateSchema),
-  async (req: Request<{}, {}, ShipmentUpdateSchemaType>, res: Response) => {
-    try{
-      const shipment = await updateShipmentStatus(req.body);
-      res.status(200).json({
-        message: "Shipment update successful",
-        data: shipment,
-      });
-    }catch(error: any){
-      res.status(error.statusCode).json({
-        code: error.statusCode,
-        message: error.message
-    });
-    }
-  }
-);
-
 router.get("/:trackingNumber", async (req: Request, res: Response) => {
   try {
     const trackingNumber: number = parseInt(req.params.trackingNumber);
