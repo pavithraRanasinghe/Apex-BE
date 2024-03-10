@@ -1,9 +1,12 @@
 import { Prisma, Role, Shipment, Status, User } from "@prisma/client";
 import { db } from "../config/db.server";
-import { ShipmentSchemaType } from "../schemas/shipment.schema";
+import {
+  ShipmentSchemaType,
+  ShipmentUpdateSchemaType,
+} from "../schemas/shipment.schema";
 import { findUnique } from "./user.service";
 import { ShipmentDTO } from "../dto/shipment.dto";
-import { saveStatus } from "./status.service";
+import { saveStatus, updateStatus } from "./status.service";
 import AppError from "../config/app.error";
 import { StatusDTO } from "../dto/status.dto";
 
@@ -13,6 +16,7 @@ export const createShipment = async (request: ShipmentSchemaType) => {
     const price = 300.0;
 
     const user: User = await findUnique({ id: request.userId });
+    console.log("CREATE : ", user);
     const shipmentRequest: Prisma.ShipmentCreateInput = {
       trackingNumber: trackingNumber,
       recipientName: request.recipientName,
@@ -26,14 +30,14 @@ export const createShipment = async (request: ShipmentSchemaType) => {
       },
     };
 
-   return await db.$transaction(async (tx) => {
+    return await db.$transaction(async (tx) => {
       const shipment = (await db.shipment.create({
         data: shipmentRequest,
       })) as Shipment;
       if (!shipment.id) {
         throw new AppError(417, "Shipment status not created");
       }
-      const shipmentStatus = await saveStatus(shipment);
+      const shipmentStatus = await saveStatus(shipment, Status.PENDING, "Shipment created");
 
       return {
         trackingNumber: shipment.trackingNumber,
@@ -48,9 +52,28 @@ export const createShipment = async (request: ShipmentSchemaType) => {
         currentStatus: shipmentStatus.status,
       } as ShipmentDTO;
     });
-  } catch (error:any) {
+  } catch (error: any) {
     console.log(error.message);
     throw new AppError(500, error.message);
+  }
+};
+
+export const updateShipmentStatus = async (
+  request: ShipmentUpdateSchemaType
+) => {
+  try {
+    const shipment = await db.shipment.findUnique({
+      where: {
+        id: request.shipmentId
+      }
+    });
+    if(!shipment){
+      throw new AppError(404, "Shipment not found");
+    }
+    await updateStatus(request.shipmentId);
+    await saveStatus(shipment, request.status as Status, request.description);
+  } catch (error) {
+    throw error;
   }
 };
 

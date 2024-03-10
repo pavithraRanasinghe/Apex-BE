@@ -28,7 +28,6 @@ export const findUnique = async (where: Prisma.UserWhereUniqueInput) => {
       where,
     })) as User;
   } catch (error) {
-    console.log('USER : ', error)
     throw new AppError(500, "Something went wrong");
   }
 };
